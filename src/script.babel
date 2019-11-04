@@ -1,0 +1,226 @@
+const defaultInput = `# Welcome to my React Markdown Previewer!
+
+## This is a sub-heading...
+### And here's some other cool stuff:
+  
+Heres some code, \`<div></div>\`, between 2 backticks.
+
+\`\`\`
+// this is multi-line code:
+
+function anotherExample(firstLine, lastLine) {
+  if (firstLine == '\`\`\`' && lastLine == '\`\`\`') {
+    return multiLineCode;
+  }
+}
+\`\`\`
+  
+You can also make text **bold**... whoa!
+Or _italic_.
+Or... wait for it... **_both!_**
+And feel free to go crazy ~~crossing stuff out~~.
+
+There's also [links](https://www.freecodecamp.com), and
+> Block Quotes!
+
+And if you want to get really crazy, even tables:
+
+Wild Header | Crazy Header | Another Header?
+------------ | ------------- | ------------- 
+Your content can | be here, and it | can be here....
+And here. | Okay. | I think we get it.
+
+- And of course there are lists.
+  - Some are bulleted.
+     - With different indentation levels.
+        - That look like this.
+
+
+1. And there are numbererd lists too.
+1. Use just 1s if you want! 
+1. But the list goes on...
+- Even if you use dashes or asterisks.
+* And last but not least, let's not forget embedded images:
+
+![React Logo w/ Text](https://goo.gl/Umyytc)
+`
+
+const renderer = new marked.Renderer();
+
+renderer.link = function (url, titleText, text ) {
+  return `
+    <a target="_blank" href=${url} title=${titleText}>
+      ${text}
+    </a>
+  `
+};
+
+
+// React 
+class Application extends React.Component{
+  constructor(props) {
+    super(props);
+    this.state = {
+      inputUser: defaultInput,
+      fullScreenEditor:false,
+      fullScreenPreview:false,
+    }
+    this.handleChange = this.handleChange.bind(this);
+    this.handlePreviewIcons= this.handlePreviewIcons.bind(this);
+    this.handleEditorIcons = this.handleEditorIcons.bind(this);
+  }
+  
+  handleChange(event) {
+    this.setState({
+      inputUser:event.target.value
+    });
+  }
+  // change icon of editor windows
+  handleEditorIcons(){
+    this.setState({
+      fullScreenEditor: !this.state.fullScreenEditor
+    })
+  }
+  // change icon fo preview windows
+  handlePreviewIcons(){
+    this.setState({
+      fullScreenPreview: !this.state.fullScreenPreview
+    })
+  }
+ 
+  
+  render(){
+   
+    const arr = ["fa fa-arrows-alt", "fa fa-compress", "fullScreenEditor", "fullScreenPreview", "ajustEditor", "ajustPreview","fa fa-arrows"]
+    let icon1 = '';
+    let size1 = '';
+    let icon2 = '';
+    let size2 = '';
+     if (this.state.fullScreenEditor) {
+      icon1 = arr[1];
+      icon2 = arr[0];
+      size1 = arr[2];
+      size2 = arr[5];
+    }
+    else if (this.state.fullScreenPreview) {
+      icon1 = arr[6];
+      icon2 = arr[1];
+      size1 = arr[4];
+      size2 = arr[3];
+    }
+    else {
+      icon1 = arr[6];
+      icon2 = arr[0];
+      size1 = arr[4];
+      size2 = arr[5];
+    }
+    
+    return( 
+
+      <div>
+        
+        <div className={size1} >
+          
+          <Toolbar name={" Editor"} iconSize={icon1} onClick={this.handleEditorIcons}/>
+          
+        <textarea  type="text" id="editor" value={this.state.inputUser} onChange={this.handleChange} />
+          
+       </div>
+        
+        <div className={size2}>
+          
+          <Toolbar name={" Preview"} iconSize={icon2} onClick={this.handlePreviewIcons} />
+          
+          <Preview markdown={this.state.inputUser} />
+          
+        </div>
+        <div style={{width:90, margin:"auto", fontSize:20, color:"black"}}><a href="https://github.com/messaismael" target='_blank' style={{color:"black"}}> by Ismael</a></div>
+        
+      </div>
+    );
+  }
+}
+
+
+// preview markdown 
+class Preview  extends React.Component{
+  // Create a new object containing only the key __html and your inputUser data as the value.
+  createMarkup () {
+    return { __html: marked(this.props.markdown, {breaks: true, renderer: renderer}) }
+  }
+  
+  render () {
+    return (
+      // convert the inputUser-markdown and consider html tags
+      <div id='preview' dangerouslySetInnerHTML={this.createMarkup()} />
+    )
+  }
+}
+
+// toolbar
+class Toolbar extends React.Component {
+  render() {
+    const toolbarStyle = {
+      display: "flex",
+      backgroundColor: '#663E10',
+      padding: '8px 8px',
+    };
+    return (
+      <div style={toolbarStyle}>
+        <i className="fa fa-free-code-camp">{this.props.name} </i>
+        <div style={{ flex: 1 }}>             </div>
+        <i onClick={this.props.onClick} className={this.props.iconSize}></i>
+        { /**<i className=" fa fa-compress"></i> or <i className= " fa fa-arrows-alt"></i> **/ }
+      </div> 
+    );
+  }
+}
+    
+
+// jQuery code
+
+$(document).ready(function(){
+  
+  $(".fa-arrows").click( function() {
+    $(".ajustPreview").css("display","block");
+  });
+  
+  
+});
+
+
+
+
+ReactDOM.render( <Application /> , document.getElementById("app"))
+    
+    
+    
+    
+        
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          
